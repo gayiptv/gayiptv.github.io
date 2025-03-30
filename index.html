@@ -38,8 +38,8 @@
         .channel-item {
             margin: 5px 0;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            align-items: start;
         }
         .stream-button {
             background-color: #0078d7;
@@ -47,6 +47,7 @@
             border: none;
             border-radius: 5px;
             padding: 5px 10px;
+            margin-top: 5px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -60,32 +61,53 @@
             background-color: #005bb5;
         }
     </style>
+</head>
+<body>
+    <header>
+        <h1>gayiptv</h1>
+        <p> polish iptv archive</p>
+    </header>
+    <main>
+        <div class="country">
+            <h2 onclick="toggleChannels('polska-channels')">Polska</h2>
+            <div id="polska-channels" class="channel-list">
+                <!-- Kanały zostaną wygenerowane dynamicznie -->
+            </div>
+        </div>
+    </main>
     <script>
         async function loadStreams() {
-            // Pobierz dane z pliku streams.json
-            const response = await fetch('streams.json');
-            const streamsData = await response.json();
+            try {
+                const response = await fetch('streams.json');
+                if (!response.ok) throw new Error('Błąd podczas ładowania streams.json');
+                const streamsData = await response.json();
 
-            const channelList = document.getElementById('polska-channels');
-            const channels = Object.keys(streamsData).sort(); // Posortowane kanały
+                const channelList = document.getElementById('polska-channels');
+                const channels = Object.keys(streamsData).sort();
 
-            channels.forEach(channel => {
-                const channelItem = document.createElement('div');
-                channelItem.className = 'channel-item';
-                channelItem.textContent = channel;
+                channels.forEach(channel => {
+                    const channelItem = document.createElement('div');
+                    channelItem.className = 'channel-item';
 
-                if (streamsData[channel]) {
-                    const streamButton = document.createElement('button');
-                    streamButton.className = 'stream-button';
-                    streamButton.innerHTML = `<img src="stream-icon.png" alt="Stream Icon"> Streamy`;
-                    streamButton.onclick = () => {
-                        window.open(streamsData[channel], '_blank');
-                    };
-                    channelItem.appendChild(streamButton);
-                }
+                    const channelTitle = document.createElement('div');
+                    channelTitle.textContent = channel;
+                    channelItem.appendChild(channelTitle);
 
-                channelList.appendChild(channelItem);
-            });
+                    if (streamsData[channel].length > 0) {
+                        streamsData[channel].forEach(stream => {
+                            const streamButton = document.createElement('button');
+                            streamButton.className = 'stream-button';
+                            streamButton.innerHTML = `<img src="stream-icon.png" alt="Stream Icon"> Streamy`;
+                            streamButton.onclick = () => window.open(stream, '_blank');
+                            channelItem.appendChild(streamButton);
+                        });
+                    }
+
+                    channelList.appendChild(channelItem);
+                });
+            } catch (error) {
+                console.error('Wystąpił błąd:', error.message);
+            }
         }
 
         function toggleChannels(countryId) {
@@ -97,19 +119,5 @@
             loadStreams();
         });
     </script>
-</head>
-<body>
-    <header>
-        <h1>gayiptv</h1>
-        <p>best polish iptv archive, updated frequently</p>
-    </header>
-    <main>
-        <div class="country">
-            <h2 onclick="toggleChannels('polska-channels')">Polska</h2>
-            <div id="polska-channels" class="channel-list">
-                <!-- Kanały zostaną wygenerowane dynamicznie -->
-            </div>
-        </div>
-    </main>
 </body>
 </html>
