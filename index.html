@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gayiptv/</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #0078d7;
+            color: white;
+            padding: 20px 10px;
+            text-align: center;
+        }
+        .country {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .country h2 {
+            cursor: pointer;
+            color: #0078d7;
+        }
+        .channel-list {
+            display: none;
+            margin-top: 10px;
+            padding-left: 10px;
+        }
+        .channel-item {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stream-button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .stream-button img {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        .stream-button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+    <script>
+        async function loadStreams() {
+            // Pobierz dane z pliku streams.json
+            const response = await fetch('streams.json');
+            const streamsData = await response.json();
+
+            const channelList = document.getElementById('polska-channels');
+            const channels = Object.keys(streamsData).sort(); // Posortowane kanały
+
+            channels.forEach(channel => {
+                const channelItem = document.createElement('div');
+                channelItem.className = 'channel-item';
+                channelItem.textContent = channel;
+
+                if (streamsData[channel]) {
+                    const streamButton = document.createElement('button');
+                    streamButton.className = 'stream-button';
+                    streamButton.innerHTML = `<img src="stream-icon.png" alt="Stream Icon"> Streamy`;
+                    streamButton.onclick = () => {
+                        window.open(streamsData[channel], '_blank');
+                    };
+                    channelItem.appendChild(streamButton);
+                }
+
+                channelList.appendChild(channelItem);
+            });
+        }
+
+        function toggleChannels(countryId) {
+            const channelList = document.getElementById(countryId);
+            channelList.style.display = channelList.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStreams();
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>gayiptv</h1>
+        <p>best polish iptv archive, updated frequently</p>
+    </header>
+    <main>
+        <div class="country">
+            <h2 onclick="toggleChannels('polska-channels')">Polska</h2>
+            <div id="polska-channels" class="channel-list">
+                <!-- Kanały zostaną wygenerowane dynamicznie -->
+            </div>
+        </div>
+    </main>
+</body>
+</html>
